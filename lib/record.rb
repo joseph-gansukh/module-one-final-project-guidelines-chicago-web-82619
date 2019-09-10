@@ -1,4 +1,4 @@
 class Record < ActiveRecord::Base
-    belongs_to :babies
-    belongs_to :activities
+    belongs_to :baby 
+    belongs_to :activity
 end
