@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 20190910154815) do
     t.string "gender"
   end
 
-  create_table "baby_activities", force: :cascade do |t|
+  create_table "records", force: :cascade do |t|
     t.integer "activity_id"
     t.integer "baby_id"
     t.string  "caregiver"
