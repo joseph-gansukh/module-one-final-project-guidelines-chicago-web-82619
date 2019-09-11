@@ -16,14 +16,25 @@ def welcome
     puts "Welcome to the Baby Activity Tracker"
     puts " "
 end
+current_user = nil
 
 def login
     prompt = TTY::Prompt.new
     answer = prompt.select("Login as:", %w(Existing_User New_User))
+
+    # current_user = User.create_user
+
     if answer == "Existing_User"
         username = prompt.ask('Please enter your username:')
-        
-        puts " "
+        current_user ||= User.existing_user(username)
+        if current_user
+            puts "You are logged in as #{current_user.name}."
+        else
+            puts "Invalid user. Do you want to create a new user?"
+            login
+        end
+        # binding.pry
+    
         
         spinner = TTY::Spinner.new("Logging in :spinner ... ", format: :spin_2)
         5.times do
@@ -41,12 +52,13 @@ def login
         # puts "Please fill out the following to create new user:"
         # new_user = prompt.collect do
         #     key(:name).ask('Name?')
-        #     key(:username).ask('Username?')
+        #     # key(:username).ask('Username?')
         # end
 
-        # # Baby.create(name: "#{new_user[:baby_name]}")
-        create_user
-
+        # current_user = User.create(name: "#{new_user[:name]}")
+        current_user ||= User.create_user
+        # ||= User.existing_user(username)
+        binding.pry
         puts ""
 
         spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
