@@ -84,13 +84,21 @@ class User < ActiveRecord::Base
 
     def self.babies
         prompt = TTY::Prompt.new
-        answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby))
+        answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby Back))
         if answer == "View_Baby"
             @current_user.reload
             # puts @current_user.babies.first
-            @current_user.babies.each do |baby|
-                puts baby.name
+            if !@current_user.babies.empty?
+                @current_user.babies.each do |baby|
+                    puts baby.name
+                end
+            else 
+                system 'clear'
+                puts " "
+                puts "Please add a baby".red
+                puts " "
             end
+        
             babies
         elsif answer == "New_Baby"
             # @current_user.create_baby
@@ -106,6 +114,9 @@ class User < ActiveRecord::Base
             babies
         elsif answer == "Delete_Baby"
             p delete baby
+        else 
+            system 'clear'
+            main_menu
         end
     end
 end

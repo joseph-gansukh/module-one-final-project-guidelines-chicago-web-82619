@@ -3,8 +3,8 @@ require_relative '../config/environment'
 font = TTY::Font.new(:doom)
 pastel = Pastel.new
 system 'clear'
-puts pastel.red(font.write("Baby    Activity"))
-puts pastel.red(font.write("                  Tracker"))
+puts pastel.white(font.write("Baby    Activity"))
+puts pastel.white(font.write("                  Tracker"))
 
 def welcome
     spinner = TTY::Spinner.new("Loading App :spinner ... ", format: :spin_2)
