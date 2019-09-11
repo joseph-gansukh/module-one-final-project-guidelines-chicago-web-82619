@@ -11,8 +11,8 @@ class User < ActiveRecord::Base
     def create_user
         puts "What is your name?"
         name = gets.chomp
-        new_user = self.create(name: name)    
-        puts "Your username is #{new_user.name} and your user id is #{new_user.id}!"
+        @user = self.create(name: name)    
+        puts "Your username is #{@user.name} and your user id is #{@user.id}!"
     end
 
     def existing_user?

@@ -38,13 +38,14 @@ def login
         main_menu
     else
         #create new user
-        puts "Please fill out the following to create new user:"
-        new_user = prompt.collect do
-            key(:name).ask('Name?')
-            key(:username).ask('Username?')
-        end
-        
-        # Baby.create(name: "#{new_user[:baby_name]}")
+        # puts "Please fill out the following to create new user:"
+        # new_user = prompt.collect do
+        #     key(:name).ask('Name?')
+        #     key(:username).ask('Username?')
+        # end
+
+        # # Baby.create(name: "#{new_user[:baby_name]}")
+        create_user
 
         puts ""
 
@@ -77,8 +78,8 @@ def babies
         birth_date = gets.chomp
         puts "What is the baby's sex?"
         sex = gets.chomp
-        babe = Baby.create(name: new_baby, birth_date: birth_date, gender: sex)
-        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.gender}"
+        babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
+        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
         
         babies
     elsif answer == "Delete_Baby"
