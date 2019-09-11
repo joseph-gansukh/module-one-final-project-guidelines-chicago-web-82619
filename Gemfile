@@ -8,3 +8,5 @@ gem "require_all"
 gem 'tty-prompt'
 gem 'tty-font'
 gem 'tty-spinner'
+gem 'colorize'
+gem 'tty-table'
