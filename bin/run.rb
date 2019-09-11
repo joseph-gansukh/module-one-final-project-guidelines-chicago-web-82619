@@ -43,6 +43,7 @@ def login
             key(:name).ask('Name?')
             key(:username).ask('Username?')
         end
+        
         # Baby.create(name: "#{new_user[:baby_name]}")
 
         puts ""
@@ -66,7 +67,24 @@ end
 
 def babies
     prompt = TTY::Prompt.new
-    prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby))
+    answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby))
+    if answer == "View_Baby"
+        self.babies
+    elsif answer == "New_Baby"
+        puts "What is the name of the baby?"
+        new_baby = gets.chomp
+        puts "What was the baby's birthdate? (YYYYMMDD HH:SS)"
+        birth_date = gets.chomp
+        puts "What is the baby's sex?"
+        sex = gets.chomp
+        babe = Baby.create(name: new_baby, birth_date: birth_date, gender: sex)
+        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.gender}"
+        
+        babies
+    elsif answer == "Delete_Baby"
+        p delete baby
+    end
+
 end
 
 def log_activity
