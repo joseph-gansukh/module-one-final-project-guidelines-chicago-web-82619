@@ -2,6 +2,13 @@ class User < ActiveRecord::Base
     has_many :baby_users
     has_many :babies, through: :baby_users
 
+    attr_accessor :current_user
+
+    def self.reload
+        reset
+        load
+    end
+
     def self.existing_users
         User.all.select do |user|
             puts user.name
@@ -17,7 +24,7 @@ class User < ActiveRecord::Base
         else 
             new_user = self.create(name: name)    
         puts "Your username is #{new_user.name} and your user id is #{new_user.id}!"
-        new_user
+        @current_user = new_user
         end
     end
 
@@ -25,33 +32,16 @@ class User < ActiveRecord::Base
         self.all.find_by(name: name)
     end
 
-
-    def existing_user?
-    end
-
-    def create_baby
-        puts "What is your baby's name?"
-        baby_name = gets.chomp
-        puts "What is your baby's birthdate? YYYYMMDD HHMMSS"
-        baby_birthdate = gets.chomp
-        puts "What is the sex of your baby?"
-        baby_sex = gets.chomp
-        new_baby = Baby.create(name: baby_name, birthdate: baby_birthdate, sex: baby_sex)
-        self.babies << new_baby
-        BabyUser.create(user_id: self.id, baby_id: new_baby.id)
-        puts "Your new baby is #{new_baby.name}. It was born #{new_baby.birthdate}. It's assigned sex at birth was #{new_baby.sex}"
-        new_baby
-    end
-
     def self.login
         prompt = TTY::Prompt.new
-        answer = prompt.select("Login as:", %w(Existing_User New_User))
+        answer = prompt.select("Login as:", %w(Existing_User New_User \ Exit))
     
         if answer == "Existing_User"
             username = prompt.ask('Please enter your username:')
-            current_user ||= User.existing_user(username)
-            if current_user
-                puts "You are logged in as #{current_user.name}."
+            @current_user ||= User.existing_user(username)
+            if @current_user
+                puts "You are logged in as #{@current_user.name}."
+                # binding.pry
             else
                 puts "Invalid user."
                 login
@@ -69,9 +59,10 @@ class User < ActiveRecord::Base
             
             puts "Welcome back, #{username.upcase}! "
             main_menu
-        else
-            current_user ||= User.create_user
-            binding.pry
+            # binding.pry
+        elsif answer == "New_User"
+            @current_user ||= User.create_user
+            # binding.pry
             puts " "
             
             spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
@@ -85,7 +76,36 @@ class User < ActiveRecord::Base
             
             puts " "
             main_menu
+        else
+            exit
         end    
-        binding.pry
+        # binding.pry
+    end
+
+    def self.babies
+        prompt = TTY::Prompt.new
+        answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby))
+        if answer == "View_Baby"
+            @current_user.reload
+            # puts @current_user.babies.first
+            @current_user.babies.each do |baby|
+                puts baby.name
+            end
+            babies
+        elsif answer == "New_Baby"
+            # @current_user.create_baby
+            puts "What is the name of the baby?"
+            new_baby = gets.chomp
+            puts "What was the baby's birthdate? (YYYYMMDD HH:SS)"
+            birth_date = gets.chomp
+            puts "What is the baby's sex?"
+            sex = gets.chomp
+            babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
+            new_baby_user = BabyUser.create(user_id: @current_user.id, baby_id: babe.id)
+            puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
+            babies
+        elsif answer == "Delete_Baby"
+            p delete baby
+        end
     end
 end
