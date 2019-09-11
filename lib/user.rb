@@ -43,4 +43,49 @@ class User < ActiveRecord::Base
         new_baby
     end
 
+    def self.login
+        prompt = TTY::Prompt.new
+        answer = prompt.select("Login as:", %w(Existing_User New_User))
+    
+        if answer == "Existing_User"
+            username = prompt.ask('Please enter your username:')
+            current_user ||= User.existing_user(username)
+            if current_user
+                puts "You are logged in as #{current_user.name}."
+            else
+                puts "Invalid user."
+                login
+            end
+        
+            
+            spinner = TTY::Spinner.new("Logging in :spinner ... ", format: :spin_2)
+            5.times do
+            spinner.spin
+            sleep(0.1)
+            end
+            spinner.stop('Logged in successfully')
+            
+            puts ""
+            
+            puts "Welcome back, #{username.upcase}! "
+            main_menu
+        else
+            current_user ||= User.create_user
+            binding.pry
+            puts " "
+            
+            spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
+            7.times do
+                spinner.spin
+                sleep(0.1)
+            end
+            spinner.stop('Registered successfully')
+            
+            puts " "
+            
+            puts " "
+            main_menu
+        end    
+        binding.pry
+    end
 end

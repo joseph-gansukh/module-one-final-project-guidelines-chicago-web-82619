@@ -16,67 +16,10 @@ def welcome
     puts "Welcome to the Baby Activity Tracker"
     puts " "
 end
+
 current_user = nil
 
-def login
-    prompt = TTY::Prompt.new
-    answer = prompt.select("Login as:", %w(Existing_User New_User))
 
-    # current_user = User.create_user
-
-    if answer == "Existing_User"
-        username = prompt.ask('Please enter your username:')
-        current_user ||= User.existing_user(username)
-        if current_user
-            puts "You are logged in as #{current_user.name}."
-        else
-            puts "Invalid user. Do you want to create a new user?"
-            login
-        end
-        # binding.pry
-    
-        
-        spinner = TTY::Spinner.new("Logging in :spinner ... ", format: :spin_2)
-        5.times do
-        spinner.spin
-        sleep(0.1)
-        end
-        spinner.stop('Logged in successfully')
-        
-        puts ""
-        
-        puts "Welcome back, #{username.upcase}! "
-        main_menu
-    else
-        #create new user
-        # puts "Please fill out the following to create new user:"
-        # new_user = prompt.collect do
-        #     key(:name).ask('Name?')
-        #     # key(:username).ask('Username?')
-        # end
-
-        # current_user = User.create(name: "#{new_user[:name]}")
-        current_user ||= User.create_user
-        # ||= User.existing_user(username)
-        binding.pry
-        puts ""
-
-        spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
-        7.times do
-        spinner.spin
-        sleep(0.1)
-        end
-        spinner.stop('Registered successfully')
-
-        puts " "
-        
-        puts "Logged in as #{new_user[:name].upcase}"
-
-        puts " "
-
-        main_menu
-    end    
-end
 
 def babies
     prompt = TTY::Prompt.new
@@ -164,7 +107,7 @@ def main_menu
 end 
 
 welcome
-login
+User.login
 # if login == true
 #     main_menu
 # else
