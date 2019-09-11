@@ -17,53 +17,9 @@ def welcome
     puts " "
 end
 
-def login
-    prompt = TTY::Prompt.new
-    answer = prompt.select("Login as:", %w(Existing_User New_User))
-    if answer == "Existing_User"
-        username = prompt.ask('Please enter your username:')
-        
-        puts " "
-        
-        spinner = TTY::Spinner.new("Logging in :spinner ... ", format: :spin_2)
-        5.times do
-        spinner.spin
-        sleep(0.1)
-        end
-        spinner.stop('Logged in successfully')
-        
-        puts ""
-        
-        puts "Welcome back, #{username.upcase}! "
-        main_menu
-    else
-        #create new user
-        puts "Please fill out the following to create new user:"
-        new_user = prompt.collect do
-            key(:name).ask('Name?')
-            key(:username).ask('Username?')
-        end
-        
-        # Baby.create(name: "#{new_user[:baby_name]}")
+current_user = nil
 
-        puts ""
 
-        spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
-        7.times do
-        spinner.spin
-        sleep(0.1)
-        end
-        spinner.stop('Registered successfully')
-
-        puts " "
-        
-        puts "Logged in as #{new_user[:name].upcase}"
-
-        puts " "
-
-        main_menu
-    end    
-end
 
 def babies
     prompt = TTY::Prompt.new
@@ -77,8 +33,8 @@ def babies
         birth_date = gets.chomp
         puts "What is the baby's sex?"
         sex = gets.chomp
-        babe = Baby.create(name: new_baby, birth_date: birth_date, gender: sex)
-        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.gender}"
+        babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
+        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
         
         babies
     elsif answer == "Delete_Baby"
@@ -151,7 +107,7 @@ def main_menu
 end 
 
 welcome
-login
+User.login
 # if login == true
 #     main_menu
 # else
