@@ -68,7 +68,7 @@ def main_menu
     when "Babies"
         User.babies
     when "Log_Activity"
-        log_activity
+        User.add_activity
     when "View_Activities"
         view_activities
     when "Resources"

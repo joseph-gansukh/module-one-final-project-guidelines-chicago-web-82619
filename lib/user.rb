@@ -108,4 +108,110 @@ class User < ActiveRecord::Base
             p delete baby
         end
     end
+
+
+    def self.add_activity
+        baby_list =  "Your babies are "
+        # binding.pry
+        babies_array = @current_user.babies
+        babies_array.each_with_index do |baby, index|
+            baby_list << " #{index + 1}, #{baby.name}"
+        end
+        # binding.pry
+        puts baby_list + "."
+        puts "For which baby would you like to add an activity?"
+        puts "Enter a baby name:"
+        baby = gets.chomp
+        baby_object = Baby.find_by(name: baby)
+        puts "You have selected #{baby_object.name}"
+        puts "Please enter an activity (feeding, sleep, diaper, bath):"
+        activity = gets.chomp
+        if activity == "feeding"
+            puts "What time was the feeding?"
+            start_time = gets.chomp
+            puts "What was the amount?"
+            amount = gets.chomp
+            puts "any notes?"
+            notes = gets.chomp
+            new_feeding = Activity.create(name: activity, start_time: start_time, amount: amount, notes: notes)
+            # binding.pry
+            baby_object.activities << new_feeding
+            puts "activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
+            puts new_feeding
+            puts baby_object.activities
+            main_menu
+        elsif activity == "sleep"
+            puts "What time did the baby go to sleep?"
+            start_time = gets.chomp
+            puts "What time did the baby wake up?"
+            end_time = gets.chomp
+            puts "any notes?"
+            notes = gets.chomp
+            new_sleep = Activity.create(name: activity, start_time: start_time, end_time: end_time, notes: notes)
+            # binding.pry
+            baby_object.activities << new_sleep
+            puts "activity: #{new_sleep.name}, start time: #{new_sleep.start_time}, end time: #{new_sleep.end_time}, notes: #{new_sleep.notes}"
+            puts new_sleep
+            puts baby_object.activities
+            main_menu
+        elsif activity == "diaper"
+            puts "What time did you change the diaper?"
+            start_time = gets.chomp
+            puts "How was the baby's diaper?"
+            diaper_status = gets.chomp
+            puts "any notes?"
+            notes = gets.chomp
+            new_diaper = Activity.create(name: activity, start_time: start_time, diaper_status: diaper_status, notes: notes)
+            # binding.pry
+            baby_object.activities << new_diaper
+            puts "activity: #{new_diaper.name}, start time: #{new_diaper.start_time}, diaper status: #{new_diaper.diaper_status}, notes: #{new_diaper.notes}"
+            puts new_diaper
+            puts baby_object.activities
+            main_menu
+        elsif activity == "bath"
+            puts "What time was the bath?"
+            start_time = gets.chomp
+            puts "How long was the bath?"
+            duration = gets.chomp
+            puts "any notes?"
+            notes = gets.chomp
+            new_bath = Activity.create(name: activity, start_time: start_time, duration: duration, notes: notes)
+            # binding.pry
+            baby_object.activities << new_bath
+            puts "activity: #{new_bath.name}, start time: #{new_bath.start_time}, duration #{new_bath.duration} notes: #{new_bath.notes}"
+            puts new_bath
+            puts baby_object.activities
+            main_menu
+        else
+            "invalid input, try again"
+            self.select_activity
+        end
+    end
+
+    def self.view_activities
+        prompt = TTY::Prompt.new
+        selection = prompt.select("How would you like to view activities?", %w(All By_Day By_Week By_Month By_Year By_Baby By_User))
+        # conditionals dictating where to go.
+
+        case selection 
+        when "All"
+            
+        when "By_Day"
+            
+        when "By_Week"
+            
+        when "By_Month"
+            
+        when "By_Year"
+
+        when "By_Baby"
+        
+        when "By_User"
+
+        else
+
+        end
+    end
+
+
 end
