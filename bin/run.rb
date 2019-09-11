@@ -2,6 +2,7 @@ require_relative '../config/environment'
 
 font = TTY::Font.new(:doom)
 pastel = Pastel.new
+system 'clear'
 puts pastel.red(font.write("Baby    Activity"))
 puts pastel.red(font.write("                  Tracker"))
 
@@ -17,31 +18,8 @@ def welcome
     puts " "
 end
 
-current_user = nil
 
 
-
-def babies
-    prompt = TTY::Prompt.new
-    answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby))
-    if answer == "View_Baby"
-        self.babies
-    elsif answer == "New_Baby"
-        puts "What is the name of the baby?"
-        new_baby = gets.chomp
-        puts "What was the baby's birthdate? (YYYYMMDD HH:SS)"
-        birth_date = gets.chomp
-        puts "What is the baby's sex?"
-        sex = gets.chomp
-        babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
-        puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
-        
-        babies
-    elsif answer == "Delete_Baby"
-        p delete baby
-    end
-
-end
 
 def log_activity
     prompt = TTY::Prompt.new
@@ -88,7 +66,7 @@ def main_menu
 
     case selection 
     when "Babies"
-        babies
+        User.babies
     when "Log_Activity"
         log_activity
     when "View_Activities"
@@ -108,6 +86,7 @@ end
 
 welcome
 User.login
+
 # if login == true
 #     main_menu
 # else

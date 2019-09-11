@@ -6,12 +6,12 @@ User.create(name:"nanny")
 
 # Babies 
 Baby.destroy_all
-Baby.create(name: "Aria", birth_date: "2019-09-10", gender: "female")
-Baby.create(name: "Aaron", birth_date: "2012-06-12", gender: "male")
-Baby.create(name: "Joseph", due_date: "2011-08-11", gender: "male")
-Baby.create(name: "Daniel", birth_date: "2013-05-20", gender: "male")
-Baby.create(name: "Christine", birth_date: "2018-01-01", gender: "female")
-Baby.create(name: "David", birth_date: "2019-06-25", gender: "male")
+Baby.create(name: "Aria", birth_date: "2019-09-10", sex: "female")
+Baby.create(name: "Aaron", birth_date: "2012-06-12", sex: "male")
+Baby.create(name: "Joseph", due_date: "2011-08-11", sex: "male")
+Baby.create(name: "Daniel", birth_date: "2013-05-20", sex: "male")
+Baby.create(name: "Christine", birth_date: "2018-01-01", sex: "female")
+Baby.create(name: "David", birth_date: "2019-06-25", sex: "male")
 
 # Activities 
 Activity.destroy_all
