@@ -14,16 +14,23 @@ class User < ActiveRecord::Base
             puts user.name
         end
     end
+    
+    
 
     def self.create_user
+        system 'clear'
+        puts "New user registraton".green
+        puts " "
         puts "What is your name?"
         name = gets.chomp
         if self.existing_user(name)
-            puts "Username already exist"
+            puts " "
+            puts "Username already exists.".red
+            puts " "
             login
         else 
             new_user = self.create(name: name)    
-        puts "Your username is #{new_user.name} and your user id is #{new_user.id}!"
+        
         @current_user = new_user
         end
     end
@@ -43,7 +50,9 @@ class User < ActiveRecord::Base
                 puts "You are logged in as #{@current_user.name}."
                 # binding.pry
             else
-                puts "Invalid user."
+                system 'clear'
+                puts "Invalid user. Please retry.".red
+                puts " "
                 login
             end
         
@@ -73,8 +82,8 @@ class User < ActiveRecord::Base
             spinner.stop('Registered successfully')
             
             puts " "
-            
-            puts " "
+            puts "Logged in as #{@current_user.name}!"
+        
             main_menu
         else
             exit
@@ -82,15 +91,36 @@ class User < ActiveRecord::Base
         # binding.pry
     end
 
+    def select_baby
+        prompt = TTY::Prompt.new
+        baby = self.babies
+                menu = baby.map do |babe|
+                    babe.name
+                end
+                puts " "
+            prompt.select("Select a baby", menu)
+    end
+
     def self.babies
         prompt = TTY::Prompt.new
         answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby Back))
         if answer == "View_Baby"
             @current_user.reload
+            # binding.pry
             # puts @current_user.babies.first
             if !@current_user.babies.empty?
-                @current_user.babies.each do |baby|
-                    puts baby.name
+                system 'clear'
+                # tp @current_user.babies, :name, :birth_date, :sex
+                tp @current_user.babies
+
+                @current_user.select_baby
+                # binding.pry
+
+                answer = prompt.select("", %w(Go_Back Exit))
+                if answer == "Go_back"
+                    main_menu 
+                else
+                    exit
                 end
             else 
                 system 'clear'
@@ -223,6 +253,9 @@ class User < ActiveRecord::Base
 
         end
     end
+
+    
+    
 
 
 end
