@@ -201,12 +201,31 @@ class User < ActiveRecord::Base
 
     def self.view_activities
         prompt = TTY::Prompt.new
-        selection = prompt.select("How would you like to view activities?", %w(All By_Day By_Week By_Month By_Year By_Baby By_User))
+        selection = prompt.select("How would you like to view activities?", %w(All By_Day By_Week By_Month By_Year By_Baby By_User Back))
         # conditionals dictating where to go.
 
         case selection 
         when "All"
-            
+        baby_list =  "Your babies are "
+        babies_array = @current_user.babies
+        babies_array.each_with_index do |baby, index|
+            baby_list << " #{index + 1}, #{baby.name}"
+        end
+        puts baby_list + "."
+        puts "For which baby would you like to add an activity?"
+        puts "Enter a baby name:"
+        baby = gets.chomp
+        baby_object = Baby.find_by(name: baby)
+        puts "You have selected #{baby_object.name}"
+        all_activities = Activity.all.where(baby_id: baby_object.id)
+        all_activities.each do |activity|
+            puts "***************************"
+            puts "Activity: #{activity.name}."
+            puts "Time: #{activity.start_time}"
+            puts "Notes: #{activity.notes}"
+        end
+        User.view_activities
+
         when "By_Day"
             
         when "By_Week"
