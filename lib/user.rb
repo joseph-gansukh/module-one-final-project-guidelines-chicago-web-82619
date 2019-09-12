@@ -99,6 +99,7 @@ class User < ActiveRecord::Base
                 end
                 puts " "
             prompt.select("Select a baby", menu)
+        # baby_object = Baby.find_by(name: baby)
     end
 
     def self.babies
@@ -139,7 +140,8 @@ class User < ActiveRecord::Base
             puts "What is the baby's sex?"
             sex = gets.chomp
             babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
-            new_baby_user = BabyUser.create(user_id: @current_user.id, baby_id: babe.id)
+            @current_user.babies << babe
+            # new_baby_user = BabyUser.create(user_id: @current_user.id, baby_id: babe.id)
             puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
             babies
         elsif answer == "Delete_Baby"
@@ -151,24 +153,42 @@ class User < ActiveRecord::Base
     end
 
 
-    def self.add_activity
-        baby_list =  "Your babies are "
-        # binding.pry
-        babies_array = @current_user.babies
-        babies_array.each_with_index do |baby, index|
-            baby_list << " #{index + 1}, #{baby.name}"
+    def validate_date(string)
+        format_ok = string.match(/\d{4}-\d{2}-\d{2}/)
+        parseable = Date.strptime(string, '%Y-%m-%d') rescue false
+      
+        if string == 'never' || format_ok && parseable
+          puts "date is valid"
+        else
+          puts "date is not valid"
         end
+      end
+      
+
+    def self.add_activity
         # binding.pry
-        puts baby_list + "."
-        puts "For which baby would you like to add an activity?"
-        puts "Enter a baby name:"
-        baby = gets.chomp
+        prompt = TTY::Prompt.new
+        baby = @current_user.select_baby
+# binding.pry
         baby_object = Baby.find_by(name: baby)
         puts "You have selected #{baby_object.name}"
         puts "Please enter an activity (feeding, sleep, diaper, bath):"
         activity = gets.chomp
+        #icebox - write each of this in its own method
         if activity == "feeding"
-            puts "What time was the feeding?"
+            # puts "What time was the feeding?"
+            #ask for the time
+            time = gets.chomp
+            # if time == #this time format
+                #puts invalid, please enter this format YYYYMMDD HHSS
+            # if time == 
+            # time = prompt.ask('What time was the feeding?') {|q| q.validate :time}
+            # binding.pry
+            #check for validation of time
+            #ask for the day
+            #check for validation of day
+            #convert time and date into datetime YYYY-MM-DD HH:MM:SS
+            # start_time = prompt.ask('What time was the feeding?') { |q| q.validate :datetime }
             start_time = gets.chomp
             puts "What was the amount?"
             amount = gets.chomp
@@ -267,7 +287,7 @@ class User < ActiveRecord::Base
         when "By_Baby"
         
         when "By_User"
-
+            # @current_user.babies.select #for each baby return all activities
         else
 
         end
