@@ -200,18 +200,6 @@ class User < ActiveRecord::Base
     end
 
 
-    def validate_date(string)
-        format_ok = string.match(/\d{4}-\d{2}-\d{2}/)
-        parseable = Date.strptime(string, '%Y-%m-%d') rescue false
-      
-        if string == 'never' || format_ok && parseable
-          puts "date is valid"
-        else
-          puts "date is not valid"
-        end
-      end
-      
-
     def self.add_activity
         # binding.pry
         prompt = TTY::Prompt.new
@@ -223,20 +211,11 @@ class User < ActiveRecord::Base
         activity = gets.chomp
         #icebox - write each of this in its own method
         if activity == "feeding"
-            # puts "What time was the feeding?"
-            #ask for the time
+            puts "What time was the feeding?"
+            binding.pry
             time = gets.chomp
-            # if time == #this time format
-                #puts invalid, please enter this format YYYYMMDD HHSS
-            # if time == 
-            # time = prompt.ask('What time was the feeding?') {|q| q.validate :time}
-            # binding.pry
-            #check for validation of time
-            #ask for the day
-            #check for validation of day
-            #convert time and date into datetime YYYY-MM-DD HH:MM:SS
-            # start_time = prompt.ask('What time was the feeding?') { |q| q.validate :datetime }
-            start_time = gets.chomp
+            validate_date(time)
+            # start_time = gets.chomp
             puts "What was the amount?"
             amount = gets.chomp
             puts "any notes?"
@@ -298,33 +277,20 @@ class User < ActiveRecord::Base
 
     def self.view_activities
         prompt = TTY::Prompt.new
+        baby_selection = @current_user.select_baby
+        @selected_baby = Baby.find_by(name: baby_selection)
         selection = prompt.select("How would you like to view activities?", %w[All By_Day By_Week By_Month By_Year By_Baby By_User Back])
         # conditionals dictating where to go.
-
         case selection 
         when "All"
-        baby_list =  "Your babies are "
-        babies_array = @current_user.babies
-        babies_array.each_with_index do |baby, index|
-            baby_list << " #{index + 1}, #{baby.name}"
-        end
-        puts baby_list + "."
-        puts "For which baby would you like to add an activity?"
-        puts "Enter a baby name:"
-        baby = gets.chomp
-        baby_object = Baby.find_by(name: baby)
-        puts "You have selected #{baby_object.name}"
-        all_activities = Activity.all.where(baby_id: baby_object.id)
-        all_activities.each do |activity|
-            puts "***************************"
-            puts "Activity: #{activity.name}."
-            puts "Time: #{activity.start_time}"
-            puts "Notes: #{activity.notes}"
-        end
+        tp all_activities = Activity.all.where(baby_id: @selected_baby.id)        
         User.view_activities
 
         when "By_Day"
-            
+            binding.pry
+            @selected_baby.activities.last.start_time.day
+            #view all activities for @current_user.babies.all.by_day
+
         when "By_Week"
             
         when "By_Month"
@@ -335,13 +301,13 @@ class User < ActiveRecord::Base
         
         when "By_User"
             # @current_user.babies.select #for each baby return all activities
+        when "Back"
+            main_menu
         else
-
+            exit
         end
     end
 
     
-    
-
 
 end

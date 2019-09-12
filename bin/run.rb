@@ -18,28 +18,6 @@ def welcome
     puts " "
 end
 
-def log_activity
-  prompt = TTY::Prompt.new
-  prompt.select('Choose one:', %w(Choose_Baby Choose_Activity))
-    #which baby is it?
-    #what type of activity?
-    #for activity, add info?
-    #icebox: edit info? delete activity, etc
-end
-
-def view_activities
-  prompt = TTY::Prompt.new
-  prompt.select('View Activities:', %w[For_Today Past_7_day Past_30_day By_Type All_Activities By_User By_Baby])
-    #how do you want to view your activites
-        #by day
-        #by week
-        #by month
-        #by type
-        #by all
-        #icebox by user
-        #by baby
-end
-
 def resources #icebox feature
     #growth measurements
     puts 'selected resources'
@@ -47,6 +25,7 @@ end
 
 def logout
     #goes bag to login
+    @current_user = nil
     login
 end
 
@@ -70,7 +49,7 @@ def main_menu
     when "Log_Activity"
         User.add_activity
     when "View_Activities"
-        view_activities
+        User.view_activities
     when "Resources"
         resources
     when "Log_Out"
