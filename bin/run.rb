@@ -3,8 +3,8 @@ require_relative '../config/environment'
 font = TTY::Font.new(:doom)
 pastel = Pastel.new
 system 'clear'
-puts pastel.white(font.write("Baby    Activity"))
-puts pastel.white(font.write("                  Tracker"))
+puts pastel.red(font.write("Baby    Activity"))
+puts pastel.red(font.write("                  Tracker"))
 
 def welcome
     spinner = TTY::Spinner.new("Loading App :spinner ... ", format: :spin_2)
@@ -18,10 +18,9 @@ def welcome
     puts " "
 end
 
-
 def log_activity
-    prompt = TTY::Prompt.new
-    prompt.select("Choose one:", %w(Choose_Baby Choose_Activity))
+  prompt = TTY::Prompt.new
+  prompt.select('Choose one:', %w(Choose_Baby Choose_Activity))
     #which baby is it?
     #what type of activity?
     #for activity, add info?
@@ -29,8 +28,8 @@ def log_activity
 end
 
 def view_activities
-    prompt = TTY::Prompt.new
-    prompt.select("View Activities:", %w(For_Today Past_7_day Past_30_day By_Type All_Activities By_User By_Baby))
+  prompt = TTY::Prompt.new
+  prompt.select('View Activities:', %w[For_Today Past_7_day Past_30_day By_Type All_Activities By_User By_Baby])
     #how do you want to view your activites
         #by day
         #by week
