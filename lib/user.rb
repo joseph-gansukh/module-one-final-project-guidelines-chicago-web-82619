@@ -2,7 +2,9 @@ class User < ActiveRecord::Base
     has_many :baby_users
     has_many :babies, through: :baby_users
 
-    attr_accessor :current_user, :selected_baby
+    attr_accessor :current_user, :selected_baby, :today 
+
+    @today = Time.now.day
 
     def self.reload
         reset
@@ -275,21 +277,31 @@ class User < ActiveRecord::Base
         end
     end
 
+    def test_method
+        @selected_baby.activities.select do |activity|
+            activity.start_time != nil && activity.start_time.day == 2
+        end
+    end
+
     def self.view_activities
         prompt = TTY::Prompt.new
         baby_selection = @current_user.select_baby
         @selected_baby = Baby.find_by(name: baby_selection)
-        selection = prompt.select("How would you like to view activities?", %w[All By_Day By_Week By_Month By_Year By_Baby By_User Back])
+        selection = prompt.select("How would you like to view activities?", %w[All Today By_Week By_Month By_Year By_Baby By_User Back])
         # conditionals dictating where to go.
         case selection 
         when "All"
         tp all_activities = Activity.all.where(baby_id: @selected_baby.id)        
         User.view_activities
 
-        when "By_Day"
-            binding.pry
-            @selected_baby.activities.last.start_time.day
-            #view all activities for @current_user.babies.all.by_day
+        when "Today"
+            # binding.pry
+            a = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @today
+            end
+
+            tp a, :start_time, :end_time, :name, :diaper_status, :notes
+            User.view_activities
 
         when "By_Week"
             
