@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
     has_many :baby_users
     has_many :babies, through: :baby_users
 
-    attr_accessor :current_user
+    attr_accessor :current_user, :selected_baby
 
     def self.reload
         reset
@@ -91,6 +91,12 @@ class User < ActiveRecord::Base
         # binding.pry
     end
 
+    # def add_baby_to_another_user
+    #     select_baby
+    #     add_nanny create_or_findby
+    #     shovel baby << user 
+    # end
+
     def select_baby
         prompt = TTY::Prompt.new
         baby = self.babies
@@ -98,31 +104,74 @@ class User < ActiveRecord::Base
                     babe.name
                 end
                 puts " "
-            prompt.select("Select a baby", menu)
-        # baby_object = Baby.find_by(name: baby)
+        prompt.select("Select a baby", menu)
     end
 
     def self.babies
         prompt = TTY::Prompt.new
-        answer = prompt.select("Choose one:", %w(View_Baby New_Baby Delete_Baby Back))
-        if answer == "View_Baby"
+        answer = prompt.select("Choose one:", %w(View/Edit_Baby New_Baby Back))
+        if answer == "View/Edit_Baby"
             @current_user.reload
             # binding.pry
             # puts @current_user.babies.first
             if !@current_user.babies.empty?
                 system 'clear'
-                # tp @current_user.babies, :name, :birth_date, :sex
-                tp @current_user.babies
+                tp @current_user.babies, :name, :birth_date, :sex
+                # tp @current_user.babies
 
-                @current_user.select_baby
-                # binding.pry
+                baby_selection = @current_user.select_baby
+                @selected_baby = Baby.find_by(name: baby_selection)
+                
+                answer = prompt.select("", %w(Edit Remove Main_Menu Exit))
 
-                answer = prompt.select("", %w(Go_Back Exit))
-                if answer == "Go_back"
-                    main_menu 
-                else
-                    exit
+                case answer 
+                when "Edit"
+                    answer = prompt.select("", %w(Edit_Name Edit_BirthDate Edit_Sex Exit))
+                    system 'clear'
+                    case answer
+                    when "Edit_Name"
+                        puts "Current Name: #{@selected_baby.name}"
+                        answer = prompt.ask("New Name:")
+                        puts "Changed name to #{answer}"
+                        baby_to_update_name = Baby.find_by(name: @selected_baby.name)
+                        baby_to_update_name.name = answer
+                        baby_to_update_name.save
+                        @current_user.reload
+                    when "Edit_BirthDate"
+                        puts "Current Birthdate: #{@selected_baby.birth_date}"
+                        answer = prompt.ask("New Birthday? YYYYMMDD:")
+                        puts "Changed birthday to #{answer}"
+                        baby_to_update_bday = Baby.find_by(name: @selected_baby.name)
+                        baby_to_update_bday.birth_date = answer
+                        baby_to_update_bday.save
+                        @current_user.reload
+                    when "Edit_Sex"
+                        puts "Current Sex: #{@selected_baby.sex}"
+                        answer = prompt.ask("New Sex:")
+                        puts "Changed sex to #{answer}"
+                        baby_to_update_sex = Baby.find_by(name: @selected_baby.name)
+                        baby_to_update_sex.sex = answer
+                        baby_to_update_sex.save
+                        @current_user.reload
+                    else
+                        main_menu 
+                    end
+                when "Remove"
+                    puts "Removed #{@selected_baby.name}."
+                    @selected_baby.destroy
+                when "Main_Menu"
+                    main_menu
+                else 
+                    exit  
                 end
+            
+
+                # answer1 = prompt.select("", %w(Go_Back Exit))
+                # if answer1 == "Go_back"
+                #     babies
+                # else
+                #     exit
+                # end
             else 
                 system 'clear'
                 puts " "
@@ -135,7 +184,7 @@ class User < ActiveRecord::Base
             # @current_user.create_baby
             puts "What is the name of the baby?"
             new_baby = gets.chomp
-            puts "What was the baby's birthdate? (YYYYMMDD HH:SS)"
+            puts "What was the baby's birthdate? (YYYYMMDD)"
             birth_date = gets.chomp
             puts "What is the baby's sex?"
             sex = gets.chomp
@@ -144,8 +193,6 @@ class User < ActiveRecord::Base
             # new_baby_user = BabyUser.create(user_id: @current_user.id, baby_id: babe.id)
             puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
             babies
-        elsif answer == "Delete_Baby"
-            p delete baby
         else 
             system 'clear'
             main_menu
@@ -251,7 +298,7 @@ class User < ActiveRecord::Base
 
     def self.view_activities
         prompt = TTY::Prompt.new
-        selection = prompt.select("How would you like to view activities?", %w(All By_Day By_Week By_Month By_Year By_Baby By_User Back))
+        selection = prompt.select("How would you like to view activities?", %w[All By_Day By_Week By_Month By_Year By_Baby By_User Back])
         # conditionals dictating where to go.
 
         case selection 
