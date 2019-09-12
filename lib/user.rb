@@ -104,13 +104,16 @@ class User < ActiveRecord::Base
     def select_baby
         prompt = TTY::Prompt.new
         baby = self.babies
-            menu = baby.map do |babe|
-                babe.name
-            end
-            puts " "
+      menu = baby.map do |babe|
+                    babe.name
+                end
+                puts " "
+        answer = prompt.select("Select a baby", menu, %w(back))
+        if answer == "back"
+            main_menu
+        end
+        answer
 
-        prompt.select("Select a baby", menu) 
-        # prompt.select("Select a baby", menu) unless baby.count == 1
     end
 
     def self.babies
@@ -178,14 +181,6 @@ class User < ActiveRecord::Base
                 else 
                     exit  
                 end
-            
-
-                # answer1 = prompt.select("", %w(Go_Back Exit))
-                # if answer1 == "Go_back"
-                #     babies
-                # else
-                #     exit
-                # end
             else 
                 system 'clear'
                 puts " "
@@ -213,10 +208,144 @@ class User < ActiveRecord::Base
         end
     end
 
+    def self.activity_menu
+        prompt = TTY::Prompt.new
+        selection = prompt.select("Select one:", %w(Add_Activity Edit_Activity Delete_Activity back))
+# binding.pry
+        case selection
+        when "Add_Activity"
+            User.add_activity
+        when "Edit_Activity"
+            User.edit_activity
+        when "Delete_Activity"
+            User.delete_activity
+        when "back"
+            main_menu
+        end
+    end
+
+    def self.delete_activity
+        prompt = TTY::Prompt.new
+        selected_activity = User.select_activity
+        selected_activity = selected_activity.split(":").last.to_i
+        @selected_activity = Activity.find_by(id:selected_activity)
+        @selected_activity.destroy
+        puts "Removed #{@selected_activity.name}."
+        self.activity_menu
+    end
+
+    def self.select_activity
+        prompt = TTY::Prompt.new
+        baby_selection = @current_user.select_baby
+        @selected_baby = Baby.find_by(name: baby_selection)
+        # binding.pry
+        activity = @selected_baby.activities
+        menu = activity.map do |act|
+            "type: #{act.name}, start_time: #{act.start_time}, notes: #{act.notes}, id:#{act.id}"
+        end
+        puts " "
+        answer = prompt.select("Select an activity", menu, %w(back))
+        if answer == "back"
+            main_menu
+        end
+        answer
+
+    end
+
+    def self.edit_activity
+        prompt = TTY::Prompt.new
+        selected_activity = User.select_activity
+        selected_activity = selected_activity.split(":").last.to_i
+        @selected_activity = Activity.find_by(id:selected_activity)
+        # binding.pry
+        menu = @selected_activity.attributes.keys
+        answer = prompt.select("Which field would you like edit?", menu)
+        case answer
+        when "id"
+           puts "I'm sorry, you can't change the baby's id"
+           self.edit_activity
+        when "name"
+            # binding.pry
+
+            puts "Current name: #{@selected_activity.name}"
+            answer = prompt.ask("New Name:")
+            puts "Changed activity name to #{answer}"
+            @selected_activity.name = answer
+            @selected_activity.save
+            @selected_activity.reload
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "start_time"
+            puts "Current start time: #{@selected_activity.start_time}"
+            answer = prompt.ask("New start time:")
+            @selected_activity.start_time = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity start time to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "end_time"
+            puts "Current end time: #{@selected_activity.end_time}"
+            answer = prompt.ask("New end time:")
+            @selected_activity.end_time = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity end time to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "diaper_status"
+            puts "Current diaper status: #{@selected_activity.diaper_status}"
+            answer = prompt.ask("New diaper status:")
+            @selected_activity.diaper_status = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity diaper status to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "amount"
+            puts "Current amount: #{@selected_activity.amount}"
+            answer = prompt.ask("New amount:")
+            @selected_activity.amount = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity amount to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "duration"
+            puts "Current duration: #{@selected_activity.duration}"
+            answer = prompt.ask("New duration:")
+            @selected_activity.duration = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity duration to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "notes"
+            puts "Current notes: #{@selected_activity.notes}"
+            answer = prompt.ask("New notes:")
+            @selected_activity.notes = answer
+            @selected_activity.save
+            @selected_activity.reload
+            puts "Changed activity notes to #{answer}"
+            p @selected_activity
+            @current_user.reload
+            self.activity_menu
+        when "baby_id"
+            puts "I'm sorry you can't change the baby's id"
+            self.activity_menu
+        end
+    end
 
     def self.add_activity
         # binding.pry
         prompt = TTY::Prompt.new
+
         baby = @current_user.select_baby
         # binding.pry
         baby_object = Baby.find_by(name: baby)
@@ -228,59 +357,66 @@ class User < ActiveRecord::Base
             # binding.pry
             # time = gets.chomp
             # validate_date(time)
+
             start_time = gets.chomp
             puts "What was the amount?"
             amount = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_feeding = Activity.create(name: activity, start_time: start_time, amount: amount, notes: notes)
+            new_feeding = Activity.create(name: answer, start_time: start_time, amount: amount, notes: notes)
             # binding.pry
-            baby_object.activities << new_feeding
+            @selected_baby.activities << new_feeding
             puts "activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
             # puts new_feeding
             # puts baby_object.activities
             main_menu
+
         elsif activity == "Sleep"
+
             puts "What time did the baby go to sleep?"
             start_time = gets.chomp
             puts "What time did the baby wake up?"
             end_time = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_sleep = Activity.create(name: activity, start_time: start_time, end_time: end_time, notes: notes)
-            # binding.pry
-            baby_object.activities << new_sleep
+            new_sleep = Activity.create(name: answer, start_time: start_time, end_time: end_time, notes: notes)
+            binding.pry
+            @selected_baby.activities << new_sleep
             puts "activity: #{new_sleep.name}, start time: #{new_sleep.start_time}, end time: #{new_sleep.end_time}, notes: #{new_sleep.notes}"
-            puts new_sleep
-            puts baby_object.activities
+            # puts new_sleep
+            # puts baby_object.activities
             main_menu
+
         elsif activity == "Diaper_change"
+
             puts "What time did you change the diaper?"
             start_time = gets.chomp
             puts "How was the baby's diaper?"
             diaper_status = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_diaper = Activity.create(name: activity, start_time: start_time, diaper_status: diaper_status, notes: notes)
+            new_diaper = Activity.create(name: answer, start_time: start_time, diaper_status: diaper_status, notes: notes)
             # binding.pry
-            baby_object.activities << new_diaper
+            @selected_baby.activities << new_diaper
             puts "activity: #{new_diaper.name}, start time: #{new_diaper.start_time}, diaper status: #{new_diaper.diaper_status}, notes: #{new_diaper.notes}"
-            puts new_diaper
-            puts baby_object.activities
+            # puts new_diaper
+            # puts baby_object.activities
             main_menu
+
         elsif activity == "Bath"
+
             puts "What time was the bath?"
             start_time = gets.chomp
             puts "How long was the bath?"
             duration = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_bath = Activity.create(name: activity, start_time: start_time, duration: duration, notes: notes)
+            new_bath = Activity.create(name: answer, start_time: start_time, duration: duration, notes: notes)
             # binding.pry
-            baby_object.activities << new_bath
+            @selected_baby.activities << new_bath
             puts "activity: #{new_bath.name}, start time: #{new_bath.start_time}, duration #{new_bath.duration} notes: #{new_bath.notes}"
-            puts new_bath
-            puts baby_object.activities
+            # puts new_bath
+            # puts baby_object.activities
             main_menu
         elsif activity == "Main_Menu"
             main_menu
@@ -383,6 +519,8 @@ class User < ActiveRecord::Base
         
         when "By_User"
             # @current_user.babies.select #for each baby return all activities
+        #when 
+        #add by type of activity
         when "Back"
             main_menu
         else
