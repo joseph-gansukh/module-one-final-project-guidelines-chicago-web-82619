@@ -2,9 +2,11 @@ class User < ActiveRecord::Base
     has_many :baby_users
     has_many :babies, through: :baby_users
 
-    attr_accessor :current_user, :selected_baby, :today 
+    attr_accessor :current_user, :selected_baby, :today, :todays_month, :todays_year
 
-    @today = Time.now.day
+    @todays_day = Time.now.day
+    @todays_month = Time.now.month 
+    @todays_year = Time.now.year
 
     def self.reload
         reset
@@ -102,11 +104,13 @@ class User < ActiveRecord::Base
     def select_baby
         prompt = TTY::Prompt.new
         baby = self.babies
-                menu = baby.map do |babe|
-                    babe.name
-                end
-                puts " "
-        prompt.select("Select a baby", menu)
+            menu = baby.map do |babe|
+                babe.name
+            end
+            puts " "
+
+        prompt.select("Select a baby", menu) 
+        # prompt.select("Select a baby", menu) unless baby.count == 1
     end
 
     def self.babies
@@ -121,14 +125,20 @@ class User < ActiveRecord::Base
                 tp @current_user.babies, :name, :birth_date, :sex
                 # tp @current_user.babies
 
-                baby_selection = @current_user.select_baby
-                @selected_baby = Baby.find_by(name: baby_selection)
+                if @current_user.babies.count == 1 
+                    @selected_baby = @current_user.babies.name
+                else
+                    baby_selection = @current_user.select_baby
+                    puts "Selected #{baby_selection}."
+                    puts "Please choose one of the following:"
+                    @selected_baby = Baby.find_by(name: baby_selection)
+                end
                 
                 answer = prompt.select("", %w(Edit Remove Main_Menu Exit))
 
                 case answer 
                 when "Edit"
-                    answer = prompt.select("", %w(Edit_Name Edit_BirthDate Edit_Sex Exit))
+                    answer = prompt.select("", %w(Edit_Name Edit_BirthDate Edit_Sex Main_Menu))
                     system 'clear'
                     case answer
                     when "Edit_Name"
@@ -155,8 +165,10 @@ class User < ActiveRecord::Base
                         baby_to_update_sex.sex = answer
                         baby_to_update_sex.save
                         @current_user.reload
-                    else
+                    when "Main_Menu"
                         main_menu 
+                    else
+                        exit
                     end
                 when "Remove"
                     puts "Removed #{@selected_baby.name}."
@@ -206,18 +218,17 @@ class User < ActiveRecord::Base
         # binding.pry
         prompt = TTY::Prompt.new
         baby = @current_user.select_baby
-# binding.pry
+        # binding.pry
         baby_object = Baby.find_by(name: baby)
         puts "You have selected #{baby_object.name}"
-        puts "Please enter an activity (feeding, sleep, diaper, bath):"
-        activity = gets.chomp
+        activity = prompt.select("Please select an activity", %w(Feeding Sleep Diaper_change Bath Main_Menu))
         #icebox - write each of this in its own method
-        if activity == "feeding"
-            puts "What time was the feeding?"
-            binding.pry
-            time = gets.chomp
-            validate_date(time)
-            # start_time = gets.chomp
+        if activity == "Feeding"
+            puts "Time of feeding?"
+            # binding.pry
+            # time = gets.chomp
+            # validate_date(time)
+            start_time = gets.chomp
             puts "What was the amount?"
             amount = gets.chomp
             puts "any notes?"
@@ -226,10 +237,10 @@ class User < ActiveRecord::Base
             # binding.pry
             baby_object.activities << new_feeding
             puts "activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
-            puts new_feeding
-            puts baby_object.activities
+            # puts new_feeding
+            # puts baby_object.activities
             main_menu
-        elsif activity == "sleep"
+        elsif activity == "Sleep"
             puts "What time did the baby go to sleep?"
             start_time = gets.chomp
             puts "What time did the baby wake up?"
@@ -243,7 +254,7 @@ class User < ActiveRecord::Base
             puts new_sleep
             puts baby_object.activities
             main_menu
-        elsif activity == "diaper"
+        elsif activity == "Diaper_change"
             puts "What time did you change the diaper?"
             start_time = gets.chomp
             puts "How was the baby's diaper?"
@@ -257,7 +268,7 @@ class User < ActiveRecord::Base
             puts new_diaper
             puts baby_object.activities
             main_menu
-        elsif activity == "bath"
+        elsif activity == "Bath"
             puts "What time was the bath?"
             start_time = gets.chomp
             puts "How long was the bath?"
@@ -270,6 +281,8 @@ class User < ActiveRecord::Base
             puts "activity: #{new_bath.name}, start time: #{new_bath.start_time}, duration #{new_bath.duration} notes: #{new_bath.notes}"
             puts new_bath
             puts baby_object.activities
+            main_menu
+        elsif activity == "Main_Menu"
             main_menu
         else
             "invalid input, try again"
@@ -285,25 +298,82 @@ class User < ActiveRecord::Base
 
     def self.view_activities
         prompt = TTY::Prompt.new
-        baby_selection = @current_user.select_baby
-        @selected_baby = Baby.find_by(name: baby_selection)
-        selection = prompt.select("How would you like to view activities?", %w[All Today By_Week By_Month By_Year By_Baby By_User Back])
+
+        if @current_user.babies.count == 1 
+            @selected_baby = @current_user.babies.first
+            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day By_Month By_Year By_Baby By_User Back])
+
+        else
+            baby_selection = @current_user.select_baby
+            puts "Selected #{baby_selection}."
+            @selected_baby = Baby.find_by(name: baby_selection)
+            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day By_Month By_Year By_Baby By_User Back])
+        end
+        
+        puts "Actitivies for #{@selected_baby.name}"
+        
+        # baby_selection = @current_user.select_baby
+        # @selected_baby = Baby.find_by(name: baby_selection)
+        # selection = prompt.select("How would you like to view activities?", %w[All Today By_Week By_Month By_Year By_Baby By_User Back])
         # conditionals dictating where to go.
         case selection 
         when "All"
-        tp all_activities = Activity.all.where(baby_id: @selected_baby.id)        
+            puts " "
+        tp all_activities = Activity.all.where(baby_id: @selected_baby.id), :start_time, :end_time, :name, :diaper_status, :notes
+        
         User.view_activities
 
-        when "Today"
+        when "For_Today"
             # binding.pry
+            
             a = @selected_baby.activities.select do |activity|
-                activity.start_time != nil && activity.start_time.day == @today
+                activity.start_time != nil && activity.start_time.day == @todays_day && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
 
             tp a, :start_time, :end_time, :name, :diaper_status, :notes
             User.view_activities
+            
+        when "7_day"
+            a = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
 
-        when "By_Week"
+            b = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 1 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+
+            c = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 2 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+
+            d = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 3 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+
+            e = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 4 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+            f = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 5 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+            g = @selected_baby.activities.select do |activity|
+                activity.start_time != nil && activity.start_time.day == @todays_day - 6 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
+            end
+
+            tp a, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp b, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp c, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp d, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp e, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp f, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            tp g, :start_time, :end_time, :name, :diaper_status, :notes
+            User.view_activities
             
         when "By_Month"
             
