@@ -19,8 +19,6 @@ def welcome
 end
 
 
-
-
 def log_activity
     prompt = TTY::Prompt.new
     prompt.select("Choose one:", %w(Choose_Baby Choose_Activity))
@@ -61,7 +59,10 @@ end
 def main_menu
     puts " "
     prompt = TTY::Prompt.new
-    selection = prompt.select("You are at the main menu. Please select an option:", %w(Babies Log_Activity View_Activities Resources Log_Out Exit))
+    
+    menu = %w(Babies Log_Activity View_Activities Resources Log_Out Exit)
+
+    selection = prompt.select("You are at the main menu. Please select an option:", menu)
     # conditionals dictating where to go.
 
     case selection 

@@ -10,3 +10,4 @@ gem 'tty-font'
 gem 'tty-spinner'
 gem 'colorize'
 gem 'tty-table'
+gem "table_print"
