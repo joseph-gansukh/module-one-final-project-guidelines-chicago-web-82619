@@ -342,6 +342,14 @@ class User < ActiveRecord::Base
         end
     end
 
+    def is_it_date_time?(time)
+        begin
+            DateTime.strptime(time,'%d-%m-%Y %I:%M:%S %p')
+        rescue ArgumentError
+           puts "Entry invalid. Please enter valid datetime DD-MM-YYYY HH:MM:SS AM/PM"
+        end
+    end
+
     def self.add_activity
         # binding.pry
         prompt = TTY::Prompt.new
@@ -353,18 +361,17 @@ class User < ActiveRecord::Base
         activity = prompt.select("Please select an activity", %w(Feeding Sleep Diaper_change Bath Main_Menu))
         #icebox - write each of this in its own method
         if activity == "Feeding"
-            puts "Time of feeding?"
-            # binding.pry
-            # time = gets.chomp
-            # validate_date(time)
-
-            start_time = gets.chomp
+            puts "Time of feeding? (DD-MM-YYYY HH:MM:SS AM/PM)"
+            start_time = nil
+            while start_time == nil
+                start_time = gets.chomp
+                start_time = @current_user.is_it_date_time?(start_time)
+            end
             puts "What was the amount?"
             amount = gets.chomp
             puts "any notes?"
             notes = gets.chomp
             new_feeding = Activity.create(name: activity, start_time: start_time, amount: amount, notes: notes)
-            # binding.pry
             baby_object.activities << new_feeding
             puts "For #{baby_object.name}, you added the activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
             # puts new_feeding
@@ -373,14 +380,22 @@ class User < ActiveRecord::Base
 
         elsif activity == "Sleep"
 
-            puts "What time did the baby go to sleep?"
-            start_time = gets.chomp
-            puts "What time did the baby wake up?"
-            end_time = gets.chomp
+            puts "What time did the baby go to sleep? (DD-MM-YYYY HH:MM:SS AM/PM)"
+            start_time = nil
+            while start_time == nil
+                start_time = gets.chomp
+                start_time = @current_user.is_it_date_time?(start_time)
+            end
+            puts "What time did the baby wake up? (DD-MM-YYYY HH:MM:SS AM/PM)"
+            end_time = nil
+            while end_time == nil
+                end_time = gets.chomp
+                end_time = @current_user.is_it_date_time?(end_time)
+            end
             puts "any notes?"
             notes = gets.chomp
             new_sleep = Activity.create(name: activity, start_time: start_time, end_time: end_time, notes: notes)
-            binding.pry
+            # binding.pry
             baby_object.activities << new_sleep
             puts "For #{baby_object.name}, you added the activity: #{new_sleep.name}, start time: #{new_sleep.start_time}, end time: #{new_sleep.end_time}, notes: #{new_sleep.notes}"
             # puts new_sleep
@@ -389,8 +404,12 @@ class User < ActiveRecord::Base
 
         elsif activity == "Diaper_change"
 
-            puts "What time did you change the diaper?"
-            start_time = gets.chomp
+            puts "What time did you change the diaper? (DD-MM-YYYY HH:MM:SS AM/PM)"
+            start_time = nil
+            while start_time == nil
+                start_time = gets.chomp
+                start_time = @current_user.is_it_date_time?(start_time)
+            end
             puts "How was the baby's diaper?"
             diaper_status = gets.chomp
             puts "any notes?"
@@ -405,8 +424,12 @@ class User < ActiveRecord::Base
 
         elsif activity == "Bath"
 
-            puts "What time was the bath?"
-            start_time = gets.chomp
+            puts "What time was the bath? (DD-MM-YYYY HH:MM:SS AM/PM)"
+            start_time = nil
+            while start_time == nil
+                start_time = gets.chomp
+                start_time = @current_user.is_it_date_time?(start_time)
+            end
             puts "How long was the bath?"
             duration = gets.chomp
             puts "any notes?"
