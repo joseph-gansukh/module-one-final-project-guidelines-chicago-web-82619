@@ -3,9 +3,9 @@ require_relative '../config/environment'
 font = TTY::Font.new(:doom)
 pastel = Pastel.new
 system 'clear'
-puts pastel.red(font.write("         BOBI            "))
+puts pastel.red(font.write("                                  BOBI            "))
 puts pastel.red(font.write("The     Baby    Activity"))
-puts pastel.red(font.write("                  Tracker"))
+puts pastel.red(font.write("                           Tracker"))
 
 def welcome
     spinner = TTY::Spinner.new("Loading App :spinner ... ", format: :spin_2)
@@ -19,9 +19,12 @@ def welcome
     puts " "
 end
 
-def resources #icebox feature
+def resources 
+    #icebox feature
     #growth measurements
-    puts 'selected resources'
+    puts 'UNDER CONSTRUCTION'
+    puts ' '
+    main_menu
 end
 
 def logout
@@ -36,28 +39,42 @@ def exit_app
 end
 
 def main_menu
-    puts " "
+    # puts " "
     prompt = TTY::Prompt.new
     
-    menu = %w(Babies Activity_Menu View_Activities Resources Log_Out Exit)
+    menu = %w(Babies Activity_Menu Resources Log_Out Exit)
 
     selection = prompt.select("You are at the main menu. Please select an option:", menu)
     # conditionals dictating where to go.
 
     case selection 
     when "Babies"
+        system 'clear'
         User.babies
     when "Activity_Menu"
+        system 'clear'
         User.activity_menu
-    when "View_Activities"
-        User.view_activities
     when "Resources"
+        system 'clear'
         resources
     when "Log_Out"
+        font = TTY::Font.new(:doom)
+        pastel = Pastel.new
+        system 'clear'
         puts "Logged out"
+        sleep (2)
+        system 'clear'
+        puts " "
+        puts pastel.red(font.write("                                  BOBI            "))
+        puts pastel.red(font.write("The     Baby    Activity"))
+        puts pastel.red(font.write("                           Tracker"))
+        # welcome
         logout
     when "Exit"
+        system 'clear'
+        # puts " "
         puts "Thank you for using Baby Activity Tracker. Bye for now!"
+        puts " "
         exit
     else
         main_menu
@@ -66,6 +83,7 @@ end
 
 welcome
 User.login
+
 
 # if login == true
 #     main_menu

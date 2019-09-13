@@ -17,17 +17,33 @@ Baby.create(name: "David", birth_date: "2019-06-25", sex: "male")
 
 # Activities 
 Activity.destroy_all
-Activity.create(name: "sleeping", start_time: "2019-09-10 09:00", amount: "200ml", notes: "Baby burped.", baby_id:Baby.first.id)
-Activity.create(name: "sleeping", start_time: "2019-09-10 11:00", amount: "150ml", notes: "Baby didn't burp.", baby_id:Baby.first.id)
-Activity.create(name: "diaper change", start_time: "2019-09-10 12:00", diaper_status: "wet", baby_id: Baby.first.id)
-Activity.create(name: "sleep", start_time: "2019-09-10 12:30", end_time: "2019-09-10 13:30", notes: "Baby cried once.", baby_id:Baby.first.id)
-Activity.create(name: "diaper change", start_time: "2019-09-10 13:45", diaper_status: "dry", notes: "Baby needs more milk.", baby_id:Baby.first.id)
+Activity.create(name: "diaper change", start_time: "2019-09-13 06:45", diaper_status: "wet", baby_id: Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-13 07:00", amount: "200ml", notes: "Baby burped.", baby_id:Baby.first.id)
+Activity.create(name: "sleep", start_time: "2019-09-13 8:00", end_time: "2019-09-13 10:30", notes: "Baby cried once.", baby_id:Baby.first.id)
+Activity.create(name: "diaper change", start_time: "2019-09-13 13:45", diaper_status: "dry", notes: "Baby needs more milk.", baby_id:Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-13 09:00", amount: "150ml", notes: "Baby didn't burp.", baby_id:Baby.first.id)
+Activity.create(name: "bathing", start_time: "2019-09-13 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
+
+Activity.create(name: "diaper change", start_time: "2019-09-12 06:45", diaper_status: "wet", baby_id: Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-12 07:00", amount: "200ml", notes: "Baby burped.", baby_id:Baby.first.id)
+Activity.create(name: "sleep", start_time: "2019-09-12 8:00", end_time: "2019-09-13 10:30", notes: "Baby cried once.", baby_id:Baby.first.id)
+Activity.create(name: "diaper change", start_time: "2019-09-12 13:45", diaper_status: "dry", notes: "Baby needs more milk.", baby_id:Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-12 09:00", amount: "150ml", notes: "Baby didn't burp.", baby_id:Baby.first.id)
 Activity.create(name: "bathing", start_time: "2019-09-12 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
+
+Activity.create(name: "diaper change", start_time: "2019-09-11 06:45", diaper_status: "wet", baby_id: Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-11 07:00", amount: "200ml", notes: "Baby burped.", baby_id:Baby.first.id)
+Activity.create(name: "sleep", start_time: "2019-09-11 8:00", end_time: "2019-09-13 10:30", notes: "Baby cried once.", baby_id:Baby.first.id)
+Activity.create(name: "diaper change", start_time: "2019-09-11 13:45", diaper_status: "dry", notes: "Baby needs more milk.", baby_id:Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-11 09:00", amount: "150ml", notes: "Baby didn't burp.", baby_id:Baby.first.id)
+Activity.create(name: "bathing", start_time: "2019-09-11 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
+
+Activity.create(name: "diaper change", start_time: "2019-09-10 06:45", diaper_status: "wet", baby_id: Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-10 07:00", amount: "200ml", notes: "Baby burped.", baby_id:Baby.first.id)
+Activity.create(name: "sleep", start_time: "2019-09-10 8:00", end_time: "2019-09-13 10:30", notes: "Baby cried once.", baby_id:Baby.first.id)
+Activity.create(name: "diaper change", start_time: "2019-09-10 13:45", diaper_status: "dry", notes: "Baby needs more milk.", baby_id:Baby.first.id)
+Activity.create(name: "feeding", start_time: "2019-09-10 09:00", amount: "150ml", notes: "Baby didn't burp.", baby_id:Baby.first.id)
 Activity.create(name: "bathing", start_time: "2019-09-10 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
-Activity.create(name: "bathing", start_time: "2019-09-06 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
-Activity.create(name: "bathing", start_time: "2019-09-07 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
-Activity.create(name: "bathing", start_time: "2019-09-08 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
-Activity.create(name: "bathing", start_time: "2019-09-05 20:00", notes: "Baby is clean now.", baby_id:Baby.first.id)
 
 BabyUser.destroy_all
 BabyUser.create(user_id: 1, baby_id: 1)
