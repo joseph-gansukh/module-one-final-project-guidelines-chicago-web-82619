@@ -3,7 +3,8 @@ require_relative '../config/environment'
 font = TTY::Font.new(:doom)
 pastel = Pastel.new
 system 'clear'
-puts pastel.red(font.write("Baby    Activity"))
+puts pastel.red(font.write("         BOBI            "))
+puts pastel.red(font.write("The     Baby    Activity"))
 puts pastel.red(font.write("                  Tracker"))
 
 def welcome
