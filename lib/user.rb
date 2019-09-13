@@ -363,10 +363,10 @@ class User < ActiveRecord::Base
             amount = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_feeding = Activity.create(name: answer, start_time: start_time, amount: amount, notes: notes)
+            new_feeding = Activity.create(name: activity, start_time: start_time, amount: amount, notes: notes)
             # binding.pry
-            @selected_baby.activities << new_feeding
-            puts "activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
+            baby_object.activities << new_feeding
+            puts "For #{baby_object.name}, you added the activity: #{new_feeding.name}, time: #{new_feeding.start_time}, amount: #{new_feeding.amount}, notes: #{new_feeding.notes}"
             # puts new_feeding
             # puts baby_object.activities
             main_menu
@@ -379,10 +379,10 @@ class User < ActiveRecord::Base
             end_time = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_sleep = Activity.create(name: answer, start_time: start_time, end_time: end_time, notes: notes)
+            new_sleep = Activity.create(name: activity, start_time: start_time, end_time: end_time, notes: notes)
             binding.pry
-            @selected_baby.activities << new_sleep
-            puts "activity: #{new_sleep.name}, start time: #{new_sleep.start_time}, end time: #{new_sleep.end_time}, notes: #{new_sleep.notes}"
+            baby_object.activities << new_sleep
+            puts "For #{baby_object.name}, you added the activity: #{new_sleep.name}, start time: #{new_sleep.start_time}, end time: #{new_sleep.end_time}, notes: #{new_sleep.notes}"
             # puts new_sleep
             # puts baby_object.activities
             main_menu
@@ -395,10 +395,10 @@ class User < ActiveRecord::Base
             diaper_status = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_diaper = Activity.create(name: answer, start_time: start_time, diaper_status: diaper_status, notes: notes)
+            new_diaper = Activity.create(name: activity, start_time: start_time, diaper_status: diaper_status, notes: notes)
             # binding.pry
-            @selected_baby.activities << new_diaper
-            puts "activity: #{new_diaper.name}, start time: #{new_diaper.start_time}, diaper status: #{new_diaper.diaper_status}, notes: #{new_diaper.notes}"
+            baby_object.activities << new_diaper
+            puts "For #{baby_object.name}, you added the activity: #{new_diaper.name}, start time: #{new_diaper.start_time}, diaper status: #{new_diaper.diaper_status}, notes: #{new_diaper.notes}"
             # puts new_diaper
             # puts baby_object.activities
             main_menu
@@ -411,10 +411,10 @@ class User < ActiveRecord::Base
             duration = gets.chomp
             puts "any notes?"
             notes = gets.chomp
-            new_bath = Activity.create(name: answer, start_time: start_time, duration: duration, notes: notes)
+            new_bath = Activity.create(name: activity, start_time: start_time, duration: duration, notes: notes)
             # binding.pry
-            @selected_baby.activities << new_bath
-            puts "activity: #{new_bath.name}, start time: #{new_bath.start_time}, duration #{new_bath.duration} notes: #{new_bath.notes}"
+            baby_object.activities << new_bath
+            puts "For #{baby_object.name}, you added the activity: #{new_bath.name}, start time: #{new_bath.start_time}, duration: #{new_bath.duration} notes: #{new_bath.notes}"
             # puts new_bath
             # puts baby_object.activities
             main_menu
