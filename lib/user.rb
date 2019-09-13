@@ -45,13 +45,22 @@ class User < ActiveRecord::Base
 
     def self.login
         prompt = TTY::Prompt.new
-        answer = prompt.select("Login as:", %w(Existing_User New_User \ Exit))
+        answer = prompt.select("Login as:", %w(Existing_User New_User Exit))
     
         if answer == "Existing_User"
             username = prompt.ask('Please enter your username:')
+            
+            system 'clear'
+
             @current_user ||= User.existing_user(username)
             if @current_user
-                puts "You are logged in as #{@current_user.name}."
+                spinner = TTY::Spinner.new("Logging in as #{@current_user.name.capitalize}  :spinner ... ", format: :spin_2)
+                 5.times do
+                spinner.spin
+                sleep(0.1)
+                end
+                spinner.stop('Logged in successfully')
+                # puts "You are logged in as #{@current_user.name}."
                 # binding.pry
             else
                 system 'clear'
@@ -59,38 +68,36 @@ class User < ActiveRecord::Base
                 puts " "
                 login
             end
-        
-            
-            spinner = TTY::Spinner.new("Logging in :spinner ... ", format: :spin_2)
-            5.times do
-            spinner.spin
-            sleep(0.1)
-            end
-            spinner.stop('Logged in successfully')
+
             
             puts ""
             
-            puts "Welcome back, #{username.upcase}! "
+            puts "Welcome back, #{username.capitalize}! "
             main_menu
             # binding.pry
         elsif answer == "New_User"
             @current_user ||= User.create_user
             # binding.pry
             puts " "
+            system 'clear'
             
-            spinner = TTY::Spinner.new("Registering new user :spinner ... ", format: :spin_2)
+            spinner = TTY::Spinner.new("Registering #{@current_user.name.capitalize} as new user :spinner ... ", format: :spin_2)
             7.times do
                 spinner.spin
                 sleep(0.1)
             end
-            spinner.stop('Registered successfully')
+            spinner.stop('Registered successfully.')
             
             puts " "
-            puts "Logged in as #{@current_user.name}!"
+            puts "Logged in as #{@current_user.name.capitalize}!"
         
             main_menu
         else
-            exit
+        system 'clear'
+        puts " "
+        puts "Bye for now! Have a great day!"
+        puts " "
+        exit
         end    
         # binding.pry
     end
@@ -102,14 +109,16 @@ class User < ActiveRecord::Base
     # end
 
     def select_baby
+        puts " "
         prompt = TTY::Prompt.new
         baby = self.babies
       menu = baby.map do |babe|
                     babe.name
                 end
                 puts " "
-        answer = prompt.select("Select a baby", menu, %w(back))
-        if answer == "back"
+        answer = prompt.select("Select a baby", menu, %w(Back_To_Main_Menu))
+        if answer == "Back_To_Main_Menu"
+            system "clear"
             main_menu
         end
         answer
@@ -120,6 +129,7 @@ class User < ActiveRecord::Base
         prompt = TTY::Prompt.new
         answer = prompt.select("Choose one:", %w(View/Edit_Baby New_Baby Back))
         if answer == "View/Edit_Baby"
+            puts " "
             @current_user.reload
             # binding.pry
             # puts @current_user.babies.first
@@ -132,7 +142,9 @@ class User < ActiveRecord::Base
                     @selected_baby = @current_user.babies.name
                 else
                     baby_selection = @current_user.select_baby
+                    system 'clear'
                     puts "Selected #{baby_selection}."
+                    puts " "
                     puts "Please choose one of the following:"
                     @selected_baby = Baby.find_by(name: baby_selection)
                 end
@@ -146,8 +158,11 @@ class User < ActiveRecord::Base
                     case answer
                     when "Edit_Name"
                         puts "Current Name: #{@selected_baby.name}"
+                        puts " "
                         answer = prompt.ask("New Name:")
+                        puts " "
                         puts "Changed name to #{answer}"
+                        puts " "
                         baby_to_update_name = Baby.find_by(name: @selected_baby.name)
                         baby_to_update_name.name = answer
                         baby_to_update_name.save
@@ -169,14 +184,21 @@ class User < ActiveRecord::Base
                         baby_to_update_sex.save
                         @current_user.reload
                     when "Main_Menu"
+                        system 'clear'
                         main_menu 
                     else
                         exit
                     end
                 when "Remove"
-                    puts "Removed #{@selected_baby.name}."
-                    @selected_baby.destroy
+
+                    if @current_user.babies.count == 1 
+                        @selected_baby = @current_user.babies.last
+                        @selected_baby.destroy
+                    else 
+                        @selected_baby.destroy
+                    end
                 when "Main_Menu"
+                    system 'clear'
                     main_menu
                 else 
                     exit  
@@ -190,7 +212,10 @@ class User < ActiveRecord::Base
         
             babies
         elsif answer == "New_Baby"
+            system "clear"
+            puts "New Baby Registration:"
             # @current_user.create_baby
+            puts " "
             puts "What is the name of the baby?"
             new_baby = gets.chomp
             puts "What was the baby's birthdate? (YYYYMMDD)"
@@ -199,8 +224,10 @@ class User < ActiveRecord::Base
             sex = gets.chomp
             babe = Baby.create(name: new_baby, birth_date: birth_date, sex: sex)
             @current_user.babies << babe
+            puts " "
             # new_baby_user = BabyUser.create(user_id: @current_user.id, baby_id: babe.id)
-            puts "Your new baby is: name: #{babe.name}, birth date: #{babe.birth_date}, sex: #{babe.sex}"
+            puts "Your new baby is added. Name: #{babe.name}, Birth date: #{babe.birth_date}, Sex: #{babe.sex}"
+            puts " "
             babies
         else 
             system 'clear'
@@ -209,22 +236,32 @@ class User < ActiveRecord::Base
     end
 
     def self.activity_menu
+        if @current_user.babies.empty?
+            puts "No baby to select. Please add a baby.".red
+            puts " "
+            main_menu
+        else
         prompt = TTY::Prompt.new
-        selection = prompt.select("Select one:", %w(Add_Activity Edit_Activity Delete_Activity back))
+        selection = prompt.select("Select one:", %w(Add_Activity View_Activity Edit_Activity Delete_Activity back))
 # binding.pry
         case selection
         when "Add_Activity"
             User.add_activity
+        when "View_Activity"
+            User.view_activities
         when "Edit_Activity"
             User.edit_activity
         when "Delete_Activity"
             User.delete_activity
         when "back"
+            system "clear"
             main_menu
         end
     end
+    end
 
     def self.delete_activity
+        system 'clear'
         prompt = TTY::Prompt.new
         selected_activity = User.select_activity
         selected_activity = selected_activity.split(":").last.to_i
@@ -232,6 +269,7 @@ class User < ActiveRecord::Base
         @selected_activity.destroy
         puts "Removed #{@selected_activity.name}."
         self.activity_menu
+        
     end
 
     def self.select_activity
@@ -254,6 +292,7 @@ class User < ActiveRecord::Base
 
     def self.edit_activity
         prompt = TTY::Prompt.new
+        system 'clear'
         selected_activity = User.select_activity
         selected_activity = selected_activity.split(":").last.to_i
         @selected_activity = Activity.find_by(id:selected_activity)
@@ -340,12 +379,13 @@ class User < ActiveRecord::Base
             puts "I'm sorry you can't change the baby's id"
             self.activity_menu
         end
+    
     end
 
     def self.add_activity
         # binding.pry
         prompt = TTY::Prompt.new
-
+        system 'clear'
         baby = @current_user.select_baby
         # binding.pry
         baby_object = Baby.find_by(name: baby)
@@ -433,20 +473,22 @@ class User < ActiveRecord::Base
     end
 
     def self.view_activities
+        # system 'clear'
         prompt = TTY::Prompt.new
-
+    
         if @current_user.babies.count == 1 
             @selected_baby = @current_user.babies.first
-            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day By_Month By_Year By_Baby By_User Back])
+            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day Back])
 
         else
             baby_selection = @current_user.select_baby
             puts "Selected #{baby_selection}."
             @selected_baby = Baby.find_by(name: baby_selection)
-            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day By_Month By_Year By_Baby By_User Back])
+            selection = prompt.select("How would you like to view activities?", %w[All For_Today 7_day Back])
         end
         
-        puts "Actitivies for #{@selected_baby.name}"
+        # puts "Actitivies for #{@selected_baby.name}"
+        
         
         # baby_selection = @current_user.select_baby
         # @selected_baby = Baby.find_by(name: baby_selection)
@@ -454,22 +496,29 @@ class User < ActiveRecord::Base
         # conditionals dictating where to go.
         case selection 
         when "All"
+            system "clear"
             puts " "
+            if Activity.all.where(baby_id: @selected_baby).empty?
+                puts 'No activities'
+            else
         tp all_activities = Activity.all.where(baby_id: @selected_baby.id), :start_time, :end_time, :name, :diaper_status, :notes
-        
+            end
         User.view_activities
 
         when "For_Today"
             # binding.pry
             
+            system "clear"
             a = @selected_baby.activities.select do |activity|
                 activity.start_time != nil && activity.start_time.day == @todays_day && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
 
             tp a, :start_time, :end_time, :name, :diaper_status, :notes
+
             User.view_activities
             
         when "7_day"
+            system "clear"
             a = @selected_baby.activities.select do |activity|
                 activity.start_time != nil && activity.start_time.day == @todays_day && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
@@ -490,44 +539,65 @@ class User < ActiveRecord::Base
                 activity.start_time != nil && activity.start_time.day == @todays_day - 4 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
             f = @selected_baby.activities.select do |activity|
+                # binding.pry
                 activity.start_time != nil && activity.start_time.day == @todays_day - 5 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
             g = @selected_baby.activities.select do |activity|
                 activity.start_time != nil && activity.start_time.day == @todays_day - 6 && activity.start_time.month == @todays_month && activity.start_time.year == @todays_year
             end
 
-            tp a, :start_time, :end_time, :name, :diaper_status, :notes
+            tp a, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
-            tp b, :start_time, :end_time, :name, :diaper_status, :notes
+            tp b, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
-            tp c, :start_time, :end_time, :name, :diaper_status, :notes
+            tp c, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
-            tp d, :start_time, :end_time, :name, :diaper_status, :notes
+            tp d, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
-            tp e, :start_time, :end_time, :name, :diaper_status, :notes
+            tp e, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
-            tp f, :start_time, :end_time, :name, :diaper_status, :notes
+            tp f, :start_time, :end_time, :name, :diaper_status, :notes 
             puts " "
             tp g, :start_time, :end_time, :name, :diaper_status, :notes
+            puts " "
+            
+            # if e == nil
+            #     puts " "    
+            # else 
+            #     tp e, :start_time, :end_time, :name, :diaper_status, :notes 
+            # puts " "
+            # end 
+
+            # if f == nil
+            #     puts " "    
+            # else 
+            #     tp f, :start_time, :end_time, :name, :diaper_status, :notes 
+            # puts " "
+            # end 
+            
+            # if g == nil
+            #     puts " "    
+            # else 
+            #     tp g, :start_time, :end_time, :name, :diaper_status, :notes 
+            #     puts " "
+            # end
             User.view_activities
             
-        when "By_Month"
+        # when "By_Month"
             
-        when "By_Year"
+        # when "By_Year"
 
-        when "By_Baby"
+        # when "By_Baby"
         
-        when "By_User"
-            # @current_user.babies.select #for each baby return all activities
-        #when 
-        #add by type of activity
+        # when "By_User"
+        #     # @current_user.babies.select #for each baby return all activities
+        # #when 
+        # #add by type of activity
         when "Back"
             main_menu
         else
             exit
         end
-    end
-
     
-
+    end
 end
